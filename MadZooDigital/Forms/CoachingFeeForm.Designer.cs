@@ -31,6 +31,7 @@
             this.btnSave = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.txtSearch = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudHours)).BeginInit();
             this.SuspendLayout();
             // 
@@ -117,9 +118,18 @@
             this.dateTimePicker1.Size = new System.Drawing.Size(153, 20);
             this.dateTimePicker1.TabIndex = 8;
             // 
+            // txtSearch
+            // 
+            this.txtSearch.ForeColor = System.Drawing.SystemColors.Window;
+            this.txtSearch.Location = new System.Drawing.Point(120, 18);
+            this.txtSearch.Name = "txtSearch";
+            this.txtSearch.Size = new System.Drawing.Size(174, 20);
+            this.txtSearch.TabIndex = 9;
+            // 
             // CoachingFeeForm
             // 
             this.ClientSize = new System.Drawing.Size(492, 298);
+            this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.dateTimePicker1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnSave);
@@ -139,5 +149,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.TextBox txtSearch;
     }
 }

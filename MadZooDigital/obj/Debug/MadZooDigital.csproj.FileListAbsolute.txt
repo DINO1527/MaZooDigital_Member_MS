@@ -1,4 +1,3 @@
-c:\users\dino_e\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\bin\Debug\MadZooDigital.exe.config
 c:\users\dino_e\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\obj\Debug\MadZooDigital.csprojResolveAssemblyReference.cache
 c:\users\dino_e\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\obj\Debug\MadZooDigital.Properties.Resources.resources
 c:\users\dino_e\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\obj\Debug\MadZooDigital.csproj.GenerateResource.Cache
@@ -8,3 +7,4 @@ c:\users\dino_e\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigita
 c:\users\dino_e\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\obj\Debug\MadZooDigital.pdb
 c:\users\dino_e\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\obj\Debug\MadZooDigital.MainForm.resources
 C:\Users\Dino_E\documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\obj\Debug\MadZooDigital.Forms.MemberDetailsForm.resources
+C:\Users\Dino_E\Documents\visual studio 2015\Projects\MadZooDigital\MadZooDigital\obj\Debug\MadZooDigital.Forms.CoachingFeeForm.resources

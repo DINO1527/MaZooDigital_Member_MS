@@ -17,10 +17,11 @@ namespace MadZooDigital.Forms
 
         private void LoadMembers()
         {
-            string filter = cboMember.Text.Trim();
+            string filter = txtSearch.Text.Trim();
             var members = _repo.SearchActiveMembers(filter);
             cboMember.DataSource = members;
             cboMember.DisplayMember = "FullName";
+            txtSearch.Text = cboMember.DisplayMember.ToString();
             cboMember.ValueMember = "MemberID";
         }
 
