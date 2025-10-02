@@ -40,14 +40,14 @@ namespace MadZooDigital
 
         private void btnCoaching_Click(object sender, EventArgs e)
         {
-            var f = new CoachingForm();
+            var f = new CoachingFeeForm();
             f.MdiParent = this;
             f.Show();
         }
 
         private void btnMatches_Click(object sender, EventArgs e)
         {
-            var f = new MatchForm();
+            var f = new MatchFeeForm();
             f.MdiParent = this;
             f.Show();
         }

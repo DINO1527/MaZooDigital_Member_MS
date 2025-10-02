@@ -46,14 +46,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\CoachingFeeRepository.cs" />
     <Compile Include="Data\DbHelper.cs" />
+    <Compile Include="Data\MatchFeeRepository.cs" />
     <Compile Include="Data\MemberRepository.cs" />
     <Compile Include="Data\PlanRepository.cs" />
-    <Compile Include="Forms\CoachingForm.cs">
+    <Compile Include="Forms\CoachingFeeForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\CoachingForm.Designer.cs">
-      <DependentUpon>CoachingForm.cs</DependentUpon>
+    <Compile Include="Forms\CoachingFeeForm.Designer.cs">
+      <DependentUpon>CoachingFeeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\MatchFeeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MatchFeeForm.Designer.cs">
+      <DependentUpon>MatchFeeForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MatchForm.cs">
       <SubType>Form</SubType>
@@ -91,14 +99,12 @@
     <Compile Include="MainForm.designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\CoachingSession.cs" />
-    <Compile Include="Models\Enums.cs" />
+    <Compile Include="Models\CoachingFee.cs" />
     <Compile Include="Models\ExistingMemberTag.cs" />
     <Compile Include="Models\FamilyMember.cs" />
-    <Compile Include="Models\Match.cs" />
+    <Compile Include="Models\Matchfee.cs" />
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\MembershipPlan.cs" />
-    <Compile Include="Models\MonthlyStatement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\MemberDetailsForm.resx">
