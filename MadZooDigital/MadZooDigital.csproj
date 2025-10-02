@@ -107,6 +107,9 @@
     <Compile Include="Models\MembershipPlan.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\CoachingFeeForm.resx">
+      <DependentUpon>CoachingFeeForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\MemberDetailsForm.resx">
       <DependentUpon>MemberDetailsForm.cs</DependentUpon>
     </EmbeddedResource>
