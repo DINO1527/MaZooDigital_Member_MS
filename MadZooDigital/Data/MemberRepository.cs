@@ -18,12 +18,15 @@ namespace MadZooDigital.Data
 
                 {
                     cmd.CommandText = @"SELECT m.MemberID, m.FullName, m.Age, m.Phone, m.Weight, m.DOB, m.Status,
-           e.Enroll_ID, e.PlanID, e.FamilyID, e.PersonType, e.StartDate, e.EndDate, e.Plan_Status,
-           p.PlanType, p.Category, p.Fee, p.PersonMode
-    FROM Member m
-    INNER JOIN EnrollPlan e ON m.MemberID = e.MemberID
-    INNER JOIN MembershipPlan p ON e.PlanID = p.PlanID
-    WHERE m.Status = 'active'";
+       e.Enroll_ID, e.FamilyID, e.PersonType, e.StartDate, e.EndDate, e.Plan_Status,
+       p.PlanID, mp.PlanType, mp.Category, mp.Fee, mp.PersonMode
+FROM Member m
+INNER JOIN EnrollPlan e ON m.MemberID = e.MemberID
+INNER JOIN Plan_Table p ON e.FamilyID = p.FamilyID
+INNER JOIN MembershipPlan mp ON p.PlanID = mp.PlanID
+WHERE m.Status = 'active'
+
+";
                     if (!string.IsNullOrEmpty(search))
                     {
                         cmd.CommandText += " AND m.FullName LIKE @search";
@@ -137,7 +140,7 @@ namespace MadZooDigital.Data
             // --- Get next FamilyID ---
             private int GetNextFamilyId(SqlConnection conn, SqlTransaction tx)
             {
-                using (var cmd = new SqlCommand("SELECT ISNULL(MAX(FamilyID), 0) + 1 FROM EnrollPlan", conn, tx))
+                using (var cmd = new SqlCommand("SELECT ISNULL(MAX(FamilyID), 0) + 1 FROM Plan_Table", conn, tx))
                 {
                 cmd.CommandTimeout = 120;
                 return Convert.ToInt32(cmd.ExecuteScalar());
@@ -157,12 +160,20 @@ namespace MadZooDigital.Data
                     {
                         // Get new family id
                         int familyId = GetNextFamilyId(conn, tx);
+                        // ───── Insert into [Plan] once for the whole family ─────
+                        const string planSql = "INSERT INTO Plan_Table(FamilyID, PlanID) VALUES(@FamilyID, @PlanID)";
+                        using (var cmd = new SqlCommand(planSql, conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@FamilyID", familyId);
+                            cmd.Parameters.AddWithValue("@PlanID", mainMember.PlanID); // assume main member defines the plan
+                            cmd.ExecuteNonQuery();
+                        }
 
                         // ───── Main Member ─────
-                      
+
 
                         AddEnrollPlanForMember(conn, tx, mainMember,
-                                               mainMember.PlanID, familyId,
+                                                familyId,
                                                mainMember.PersonType,
                                                mainMember.StartDate ?? DateTime.Now,
                                                null,
@@ -174,7 +185,7 @@ namespace MadZooDigital.Data
                            
 
                             AddEnrollPlanForMember(conn, tx, fm,
-                                                   fm.PlanID, familyId,
+                                                    familyId,
                                                    fm.PersonType,
                                                    fm.StartDate ?? DateTime.Now,
                                                    null,
@@ -198,23 +209,15 @@ namespace MadZooDigital.Data
 
         public Member GetMemberByFullName(string fullName)
         {
-            const string sql = @"
-    SELECT TOP 1 
-        m.MemberID, 
-        m.FullName, 
-        m.Age, 
-        m.DOB, 
-        m.Weight, 
-        m.Phone, 
-        m.Status,
-        ep.PlanId,
-        ep.FamilyID,
-        ep.PersonType,
-        ep.StartDate,
-        ep.Plan_Status
-    FROM Member m
-    INNER JOIN EnrollPlan ep ON m.MemberID = ep.MemberID
-    WHERE m.FullName = @FullName";
+            const string sql = @"SELECT TOP 1 
+    m.MemberID, m.FullName, m.Age, m.DOB, m.Weight, m.Phone, m.Status,
+    ep.FamilyID, ep.PersonType, ep.StartDate, ep.Plan_Status,
+    p.PlanID
+FROM Member m
+INNER JOIN EnrollPlan ep ON m.MemberID = ep.MemberID
+INNER JOIN Plan_Table p ON ep.FamilyID = p.FamilyID
+WHERE m.FullName = @FullName
+";
             using (var conn = DbHelper.GetConnection())
             using (var cmd = new SqlCommand(sql, conn))
             {
@@ -258,7 +261,7 @@ namespace MadZooDigital.Data
 
         // Insert a new EnrollPlan record for an existing member (no member insert)
         public void AddEnrollPlanForMember(SqlConnection conn, SqlTransaction tx, Member member,
-                                     int planId, int familyId, string personType,
+                                      int familyId, string personType,
                                      DateTime startDate, DateTime? endDate, string planStatus)
         {
             int memberId = member.MemberID;
@@ -312,12 +315,13 @@ namespace MadZooDigital.Data
 
             // In both cases → add a new EnrollPlan row
             const string enrollSql = @"
-        INSERT INTO EnrollPlan (MemberID, PlanID, FamilyID, PersonType, StartDate, EndDate, Plan_Status)
-        VALUES (@MemberID, @PlanID, @FamilyID, @PersonType, @StartDate, @EndDate, @PlanStatus)";
+INSERT INTO EnrollPlan (MemberID, FamilyID, PersonType, StartDate, EndDate, Plan_Status)
+VALUES (@MemberID, @FamilyID, @PersonType, @StartDate, @EndDate, @PlanStatus)
+"
+;
             using (var cmd = new SqlCommand(enrollSql, conn, tx))
             {
                 cmd.Parameters.AddWithValue("@MemberID", memberId);
-                cmd.Parameters.AddWithValue("@PlanID", planId);
                 cmd.Parameters.AddWithValue("@FamilyID", familyId);
                 cmd.Parameters.AddWithValue("@PersonType", personType ?? "");
                 cmd.Parameters.AddWithValue("@StartDate", startDate);
@@ -358,23 +362,28 @@ namespace MadZooDigital.Data
                 if (familyId > 0)
                 {
                     cmd.CommandText = @"SELECT m.MemberID, m.FullName, m.Age, m.Phone, m.Weight, m.DOB, m.Status,
-           e.Enroll_ID, e.PlanID, e.FamilyID, e.PersonType, e.StartDate, e.EndDate, e.Plan_Status,
-           p.PlanType, p.Category, p.Fee, p.PersonMode
-    FROM Member m
-    INNER JOIN EnrollPlan e ON m.MemberID = e.MemberID
-    INNER JOIN MembershipPlan p ON e.PlanID = p.PlanID
-    WHERE e.FamilyID = @FamilyID AND e.Plan_Status=@status";
+       e.Enroll_ID, e.FamilyID, e.PersonType, e.StartDate, e.EndDate, e.Plan_Status,
+       p.PlanID, mp.PlanType, mp.Category, mp.Fee, mp.PersonMode
+FROM Member m
+INNER JOIN EnrollPlan e ON m.MemberID = e.MemberID
+INNER JOIN Plan_Table p ON e.FamilyID = p.FamilyID
+INNER JOIN MembershipPlan mp ON p.PlanID = mp.PlanID
+WHERE e.FamilyID = @FamilyID AND e.Plan_Status = @status
+";
                     cmd.Parameters.AddWithValue("@FamilyID", familyId);
                         cmd.Parameters.AddWithValue("@status", "Active");
                     }
                 else
                 {
                         cmd.CommandText = @"SELECT m.MemberID, m.FullName, m.Age, m.Phone, m.Weight, m.DOB, m.Status,
-           e.Enroll_ID, e.PlanID, e.FamilyID, e.PersonType, e.StartDate, e.EndDate, e.Plan_Status,
-           p.PlanType, p.Category, p.Fee, p.PersonMode
-    FROM Member m
-    INNER JOIN EnrollPlan e ON m.MemberID = e.MemberID
-    INNER JOIN MembershipPlan p ON e.PlanID = p.PlanID WHERE MemberID = @MemberID AND e.Plan_Status=@status";
+       e.Enroll_ID, e.FamilyID, e.PersonType, e.StartDate, e.EndDate, e.Plan_Status,
+       p.PlanID, mp.PlanType, mp.Category, mp.Fee, mp.PersonMode
+FROM Member m
+INNER JOIN EnrollPlan e ON m.MemberID = e.MemberID
+INNER JOIN Plan_Table p ON e.FamilyID = p.FamilyID
+INNER JOIN MembershipPlan mp ON p.PlanID = mp.PlanID
+WHERE m.MemberID = @MemberID AND e.Plan_Status = @status
+";
                     cmd.Parameters.AddWithValue("@MemberID", memberId);
                         cmd.Parameters.AddWithValue("@status", "Active");
                     }
