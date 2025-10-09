@@ -18,7 +18,6 @@ namespace MadZooDigital.Forms
         private int _familyId = 0;
         private bool _isEditMode = false;
         private int _selectedPlanId = 0;
-        private int _Plandurition = 0;
 
         // ──────────────────────────────────────────────────────────────
         // ░░  Constructor

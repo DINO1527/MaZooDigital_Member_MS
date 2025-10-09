@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Data/MatchFeeRepository.cs
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using MadZooDigital.Models;
 
@@ -6,89 +8,51 @@ namespace MadZooDigital.Data
 {
     public class MatchFeeRepository
     {
-        public void Add(Matchfee fee)
+        public List<Member> GetActiveMembers()
         {
+            var list = new List<Member>();
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
                 string sql = @"
-                INSERT INTO MatchFee (MemberID, MatchesPlayed, FeePerMatch, MonthYear, SubTotal)
-                VALUES (@MemberID, @MatchesPlayed, @FeePerMatch, @MonthYear, @SubTotal)";
-
+                SELECT DISTINCT m.MemberID, m.FullName, m.Age, m.Phone, m.Weight, m.DOB, m.Status,e.FamilyID
+                FROM Member m
+                INNER JOIN EnrollPlan e ON m.MemberID = e.MemberID
+                WHERE m.Status = 'Active'
+                  AND e.Plan_Status = 'Active'";
                 using (var cmd = new SqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@MemberID", fee.MemberID);
-                    cmd.Parameters.AddWithValue("@MatchesPlayed", fee.MatchesPlayed);
-                    cmd.Parameters.AddWithValue("@FeePerMatch", fee.FeePerMatch);
-                    cmd.Parameters.AddWithValue("@MonthYear", fee.MonthYear);
-                    cmd.Parameters.AddWithValue("@SubTotal", fee.SubTotal);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public Matchfee GetById(int id)
-        {
-            using (var conn = DbHelper.GetConnection())
-            {
-                conn.Open();
-                string sql = @"SELECT MatchFeeID, MemberID, MatchesPlayed, FeePerMatch, MonthYear, SubTotal 
-                               FROM MatchFee WHERE MatchFeeID=@id";
-                using (var cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
                     using (var reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
-                            var fee = new Matchfee();
-                            fee.MatchFeeID = reader.GetInt32(0);
-                            fee.MemberID = reader.GetInt32(1);
-                            fee.MatchesPlayed = reader.GetInt32(2);
-                            fee.FeePerMatch = reader.GetDecimal(3);
-                            fee.MonthYear = reader.GetString(4);
-                            fee.SubTotal = reader.GetDecimal(5);
-                            return fee;
+                            list.Add(new Member
+                            {
+                                MemberID = Convert.ToInt32(reader["MemberID"]),
+                                FullName = reader["FullName"].ToString(),
+                                FamilyID = Convert.ToInt32(reader["FamilyID"])
+                            });
                         }
                     }
                 }
             }
-            return null;
+            return list;
         }
 
-        public void Update(Matchfee fee)
+        public void SaveMatchFee(Matchfee fee)
         {
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
-                string sql = @"
-                UPDATE MatchFee
-                SET MemberID=@MemberID, MatchesPlayed=@MatchesPlayed, 
-                    FeePerMatch=@FeePerMatch, MonthYear=@MonthYear, SubTotal=@SubTotal
-                WHERE MatchFeeID=@MatchFeeID";
-
+                string sql = @"INSERT INTO MatchFee(MemberID, FamilyID, MatchesPlayed, Date, SubTotal)
+                               VALUES(@MemberID, @FamilyID, @MatchesPlayed, @Date, @SubTotal)";
                 using (var cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@MemberID", fee.MemberID);
+                    cmd.Parameters.AddWithValue("@FamilyID", fee.FamilyID);
                     cmd.Parameters.AddWithValue("@MatchesPlayed", fee.MatchesPlayed);
-                    cmd.Parameters.AddWithValue("@FeePerMatch", fee.FeePerMatch);
-                    cmd.Parameters.AddWithValue("@MonthYear", fee.MonthYear);
+                    cmd.Parameters.AddWithValue("@Date", fee.Date);
                     cmd.Parameters.AddWithValue("@SubTotal", fee.SubTotal);
-                    cmd.Parameters.AddWithValue("@MatchFeeID", fee.MatchFeeID);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public void Delete(int id)
-        {
-            using (var conn = DbHelper.GetConnection())
-            {
-                conn.Open();
-                string sql = "DELETE FROM MatchFee WHERE MatchFeeID=@id";
-                using (var cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();
                 }
             }

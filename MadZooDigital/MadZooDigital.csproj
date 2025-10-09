@@ -51,17 +51,18 @@
     <Compile Include="Data\MatchFeeRepository.cs" />
     <Compile Include="Data\MemberRepository.cs" />
     <Compile Include="Data\PlanRepository.cs" />
+    <Compile Include="Data\StatementRepository.cs" />
     <Compile Include="Forms\CoachingFeeForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CoachingFeeForm.Designer.cs">
       <DependentUpon>CoachingFeeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MatchFeeForm.cs">
+    <Compile Include="Forms\MatchEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MatchFeeForm.Designer.cs">
-      <DependentUpon>MatchFeeForm.cs</DependentUpon>
+    <Compile Include="Forms\MatchEntryForm.Designer.cs">
+      <DependentUpon>MatchEntryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MatchForm.cs">
       <SubType>Form</SubType>
@@ -105,6 +106,8 @@
     <Compile Include="Models\Matchfee.cs" />
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\MembershipPlan.cs" />
+    <Compile Include="Models\MemberStatement.cs" />
+    <Compile Include="Models\StatementItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\CoachingFeeForm.resx">

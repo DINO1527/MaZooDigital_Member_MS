@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using MadZooDigital.Forms;
 using System.Drawing;
 
+
 namespace MadZooDigital
 {
     public partial class MainForm : Form
@@ -47,7 +48,7 @@ namespace MadZooDigital
 
         private void btnMatches_Click(object sender, EventArgs e)
         {
-            var f = new MatchFeeForm();
+            var f = new MatchEntryForm();
             f.MdiParent = this;
             f.Show();
         }
